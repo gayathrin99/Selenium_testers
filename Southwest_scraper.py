@@ -24,6 +24,8 @@ def enter_arrive_and_departure(origin,destination,date,return_date):
         time.sleep(wait_time)
     departure_link=driver.find_element("id",'LandingAirBookingSearchForm_destinationAirportCode')
     destination=destination
+    one_way=driver.find_element("xpath","/html/body/div[3]/div/div/div/div[2]/div[2]/div/div/div/div/div/div/div/div[3]/span/span/div/div/div[2]/div/div/div/div/form/div[1]/div[1]/div[2]/div/fieldset/ul/li[2]/label")
+    one_way.click()
     for letter in destination:
         departure_link.send_keys(letter)
         wait_time=random.randint(0,1000)/1000
@@ -35,12 +37,12 @@ def enter_arrive_and_departure(origin,destination,date,return_date):
         depart_datelink.send_keys(letter)
         wait_time=random.randint(0,1000)/1000
         time.sleep(wait_time)
-    return_datelink=driver.find_element('id','LandingAirBookingSearchForm_returnDate')
+    '''return_datelink=driver.find_element('id','LandingAirBookingSearchForm_returnDate')
     return_date=return_date
     for letter in return_date:
         return_datelink.send_keys(letter)
         wait_time=random.randint(0,1000)/1000
-        time.sleep(wait_time)
+        time.sleep(wait_time)'''
     search_button=driver.find_element("id",'LandingAirBookingSearchForm_submit-button')
     search_button.click()
 def web_scraper():
