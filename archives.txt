@@ -1,0 +1,32 @@
+Python - for Just dial - for clicking buttons on search page
+'''input_city=driver.find_element("id","city-auto-sug")
+    input_city.click()
+    input_city.clear()
+    #Select(input_city).select_by_index[1]
+    city=city
+    for letter in city:
+        input_city.send_keys(letter)
+        wait_time=random.randint(0,1000)/1000
+        time.sleep(wait_time)
+    input_city.send_keys(Keys.ARROW_DOWN)
+    time.sleep(1)
+    input_city.send_keys(Keys.ARROW_DOWN)
+    time.sleep(1)
+    input_city.send_keys(Keys.ENTER)
+    time.sleep(1)
+    input_job_category=driver.find_element("id","main-auto")
+    try:
+        input_job_category.clear()
+    except Exception as error:
+        print(error)
+    input_job_category.send_keys(Keys.DELETE)
+    #Select(input_job_category).select_by_index[1]
+    job_category=job_category
+    for letter in job_category:
+        input_job_category.send_keys(letter)
+        wait_time=random.randint(0,1000)/1000
+        time.sleep(wait_time)   
+    search_button=driver.find_element("xpath","/html/body/div/div/section/header/div/div[2]/div/div[2]/label/div[3]/div") 
+    driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
+                              search_button, "border: {0}px solid {1};".format(5, "blue"))
+    search_button.click()'''
