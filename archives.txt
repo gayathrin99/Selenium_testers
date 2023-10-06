@@ -30,3 +30,27 @@ Python - for Just dial - for clicking buttons on search page
     driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
                               search_button, "border: {0}px solid {1};".format(5, "blue"))
     search_button.click()'''
+
+Python for meta ads page - to click the buttons
+```country_button=driver.find_element(By.ID,"js_b")
+    country=country
+    for letter in country:
+        country_button.send_keys(letter)
+        wait_time=random.randint(0,1000)/1000
+        time.sleep(wait_time)
+    adbtn = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ad category']")))
+    adbtn.click()
+    alladds = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='All ads']")))
+    alladds.click()
+    search = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='Search by keyword or advertiser']")))
+    search.send_keys(ad_name)
+    time.sleep(1)
+    search.send_keys(Keys.ENTER)
+    time.sleep(1)```
+
+Python for ad text - worksheet1.write(0,1,"Ad Running start date")
+    worksheet1.write(0,2,"Ad Text")
+    for i in range(len(ad_started_running_date)-1):
+        worksheet1.write(i+1,1,ad_started_running_date[i])
+    for i in range(len(ad_data)-1):
+        worksheet1.write(i+1,2,ad_data[i])
