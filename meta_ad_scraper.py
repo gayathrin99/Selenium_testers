@@ -1,5 +1,3 @@
-import bs4
-from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import selenium
@@ -8,11 +6,12 @@ import time
 import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+import PIL
 from PIL import Image
 import xlsxwriter
-import csv
 url="https://www.facebook.com/ads/library/"
 driver=webdriver.Chrome()
+time.sleep(5)
 ad_status=[]
 ad_data=[]
 ad_started_running_date=[]
@@ -82,7 +81,7 @@ def countries_list(country):
 def get_ad_details(url):
     url="https://www.facebook.com/ads/library/"
     page=requests.get(url)
-    soup=BeautifulSoup(page.content,"html.parser")
+    #soup=BeautifulSoup(page.content,"html.parser")
     last_height=driver.execute_script("return document.body.scrollHeight")
     itemTargetCount=500
     #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -163,4 +162,5 @@ def enter_main_inputs(country,ad_type,ad_name):
 enter_main_inputs(input("Enter the country name: "),
                   input("To choose ad category.Enter 1 for {All Ads} and 2 for {Issues,elections or politics}: "),
                   input("Enter the brand name or the ad category: "))
+time.sleep(5)
 
