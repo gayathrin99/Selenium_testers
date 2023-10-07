@@ -6,9 +6,15 @@ import time
 import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-import PIL
-from PIL import Image
 import xlsxwriter
+import os
+import functools
+import re 
+from functools import reduce 
+import imagehash
+from PIL import Image
+import numpy as np
+all_category_path="./"
 url="https://www.facebook.com/ads/library/"
 driver=webdriver.Chrome()
 time.sleep(5)
@@ -81,15 +87,18 @@ def countries_list(country):
 def get_ad_details(url):
     url="https://www.facebook.com/ads/library/"
     page=requests.get(url)
+    no_results=driver.find_element(By.XPATH,"//div[@class= 'x8t9es0 x1uxerd5 xrohxju x108nfp6 xq9mrsl x1h4wwuj x117nqv4 xeuugli']").text
+    print(no_results)
+    itemTargetCount=int(''.join([i for i in no_results if i.isdigit()]))
+    print(itemTargetCount)
     #soup=BeautifulSoup(page.content,"html.parser")
     last_height=driver.execute_script("return document.body.scrollHeight")
-    itemTargetCount=500
     #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(5)
     #print(soup.find("body"))  
     #ad_details=soup.find_all("div",class_="x1ywc1zp x78zum5 xl56j7k x1e56ztr x1277o0a")
     
-    image_number=0
+    src_number=0
     src=[]
     while itemTargetCount > len(ad_status):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -101,21 +110,45 @@ def get_ad_details(url):
         if new_height == last_height:
             break
         last_height=new_height
+        path1 = "All type"
+        path2 = "Issues, Politics and Elections"
+        # Check whether the specified path exists or not
+        isExist = os.path.exists(path1)
+        if not isExist:
+            os.makedirs(path1)
+            print("The new directory is created!")
+        isExist = os.path.exists(path2)
+        if not isExist:
+            os.makedirs(path2)
+            print("The second directory is created!")
         for img in images:
             src.append(img.get_attribute('src'))
-            print(img.get_attribute('src'))
-        for i in range(image_number,image_number+len(images)):
-            urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
-        image_number=image_number+len(images)
+            #print(img.get_attribute('src'))
+        if ad_category == "2":
+            parent_directory=os.getcwd()
+            os.chdir(parent_directory+"\Issues, Politics and Elections\\")
+            print(parent_directory+"\Issues, Politics and Elections\\")
+            for i in range(src_number,src_number+len(src)-1):
+                print (str(i)+"/"+str(len(src)))
+                urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
+        else:
+            parent_directory=os.getcwd()
+            print(parent_directory)
+            os.chdir(parent_directory+"\All type\\")
+            print(parent_directory+"\All type\\")
+            for i in range(src_number,src_number+len(src)-1):
+                print (str(i)+"/"+str(len(src)))
+                urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
+
+        src_number=src_number+len(src)-1
+        print("src number"+ str(src_number))
         ad_statuses=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli x1i64zmx']")
-        print(len(ad_statuses))
         for i in ad_statuses:
             ad_status.append(i.text)
         ad_text=driver.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
         for i in ad_text:
             ad_data.append(i.text)
         ad_dates=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli']")
-        print(len(ad_dates))
         for i in ad_dates:
             ad_started_running_date.append(i.text)
         file=open("ad data.xlsx","w+",encoding='utf-8')
@@ -124,7 +157,6 @@ def get_ad_details(url):
         worksheet1.write(0,0,"Ad Text")
     
         for i in range(len(ad_data)-1):
-            print(ad_data[i+1])
             worksheet1.write(i+1,0,ad_data[i])
         workbook.close()
     print(len(ad_status))
@@ -159,8 +191,12 @@ def enter_main_inputs(country,ad_type,ad_name):
     ad_name_input.send_keys(ad_name)
     time.sleep(2)
     '''
-enter_main_inputs(input("Enter the country name: "),
-                  input("To choose ad category.Enter 1 for {All Ads} and 2 for {Issues,elections or politics}: "),
-                  input("Enter the brand name or the ad category: "))
+ad_country=input("Enter the country name: ")
+ad_category=input("To choose ad category.Enter 1 for {All Ads} and 2 for {Issues,elections or politics}: ")
+ad_brand=input("Enter the brand name or the ad category: ")
+enter_main_inputs(ad_country,
+                  ad_category,
+                  ad_brand)
 time.sleep(5)
+
 
