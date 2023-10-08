@@ -14,6 +14,8 @@ from functools import reduce
 import imagehash
 from PIL import Image
 import numpy as np
+import tqdm
+from tqdm import tqdm
 all_category_path="./"
 url="https://www.facebook.com/ads/library/"
 driver=webdriver.Chrome()
@@ -116,55 +118,49 @@ def get_ad_details(url):
     os.chdir(parent_directory+"\\"+path+"\\")
     print(parent_directory+path+"\\")
     no_results=driver.find_element(By.XPATH,"//div[@class= 'x8t9es0 x1uxerd5 xrohxju x108nfp6 xq9mrsl x1h4wwuj x117nqv4 xeuugli']").text
-    print(no_results)
+    print("FB Directory has "+no_results+" for this brand")
     itemTargetCount=int(''.join([i for i in no_results if i.isdigit()]))
     #print(itemTargetCount)
     last_height=driver.execute_script("return document.body.scrollHeight")
     time.sleep(5)
     src_number=0
     src=[]
+    file=open("ad data.xlsx","w+",encoding='utf-8')
+    workbook=xlsxwriter.Workbook("ad data.xlsx")
+    worksheet1=workbook.add_worksheet()
+    worksheet1.write(0,0,"Ad Text")
+    worksheet1.write(0,3,"Image file Name")
     
-
-    while itemTargetCount > len(ad_status):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
-        ads=driver.find_elements(By.XPATH,"//div[@class= '_7jvw x2izyaf x1hq5gj4 x1d52u69']")
-        print(len(ads))
-        images=driver.find_elements(By.TAG_NAME,"img")
-        print(len(images))
-        time.sleep(1)
-        new_height=driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height=new_height
-        ad_text=driver.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
-        for i in ad_text:
-            ad_data.append(i.text)
-        for img in images:
-            src.append(img.get_attribute('src'))
-            #print(img.get_attribute('src'))
-        for i in range(src_number,src_number+len(src)-1):
-            print (str(i)+"/"+str(len(src)))
-            urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
-
-        src_number=src_number+len(src)-1
-        #print("src number "+ str(src_number))
-        file=open("ad data.xlsx","w+",encoding='utf-8')
-        workbook=xlsxwriter.Workbook("ad data.xlsx")
-        worksheet1=workbook.add_worksheet()
-        worksheet1.write(0,0,"Ad Text")
-        for i in range(len(ad_data)-1):
-            worksheet1.write(i+1,0,ad_data[i])
-        workbook.close()
-    #print(ad_details)
-    #images=soup.find_all("img", alt=True)
-    '''for i in ad_details:
-        images=i.find()
-        
-    for image in images:
-        print(image)
-        #img=Image.open(image)
-        #img.show()'''
+    for i in tqdm(range(0,100),total=itemTargetCount):
+        while itemTargetCount > len(ad_status):
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1)
+            new_height=driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height=new_height           
+                #print(img.get_attribute('src'))
+            ads=driver.find_elements(By.XPATH,"//div[@class= '_7jvw x2izyaf x1hq5gj4 x1d52u69']")
+            print(len(ads))
+            for ad in ads:
+                images= ad.find_elements(By.TAG_NAME,"img")
+                ad_text=ad.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
+                for img in images:
+                    src.append(img.get_attribute("src"))
+                for i in ad_text:
+                    ad_data.append(i.text)
+                print(len(images))
+                for i in range(len(ad_data)-1):
+                    worksheet1.write(i+1,0,ad_data[i]) 
+                for i in range(0,len(src)):
+                    print (str(i)+"/"+str(len(src)))
+                    urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
+                    worksheet1.write(i+1,3,"{}.jpg".format(i))
+                src_number=src_number+len(src)-1
+            #print("src number "+ str(src_number))
+            
+                
+    workbook.close()
 def enter_main_inputs(country,ad_type,ad_name):
     if ad_type == "1":
         ad_type_string="all"
@@ -179,12 +175,6 @@ def enter_main_inputs(country,ad_type,ad_name):
     urllatest=driver.current_url
     get_ad_details(urllatest)
     time.sleep(1)
-    #ad_category=Select(ad_category).select_by_index[0]
-    '''ad_name_input=driver.find_element(By.CLASS_NAME,"//div[contains(@class,'x76ihet xwmqs3e x112ta8 xxxdfa6 xhk9q7s x1otrzb0 x1i1ezom x1o6z2jb ximmm8s x1rg5ohu x1f6kntn x3stwaq xdj266r x11i5rnm xat24cr x1mh8g0r x1a2a7pz x6ikm8r x10wlt62 x1y1aw1k x1pi30zi xwib8y2 x1swvt13 x1n2onr6 xlyipyv xh8yej3 xhtitgo x1hxswl6;)]")
-    ad_name = ad_name
-    ad_name_input.send_keys(ad_name)
-    time.sleep(2)
-    '''
 ad_country=input("Enter the country name: ")
 ad_category=input("To choose ad category.Enter 1 for {All Ads} and 2 for {Issues,elections or politics}: ")
 ad_brand=input("Enter the brand name or the ad category: ")
