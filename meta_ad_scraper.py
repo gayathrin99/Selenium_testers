@@ -137,33 +137,22 @@ def get_ad_details(url):
         if new_height == last_height:
             break
         last_height=new_height
+        ad_text=driver.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
+        for i in ad_text:
+            ad_data.append(i.text)
         for img in images:
             src.append(img.get_attribute('src'))
             #print(img.get_attribute('src'))
         for i in range(src_number,src_number+len(src)-1):
             print (str(i)+"/"+str(len(src)))
             urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
-        
-            for i in range(src_number,src_number+len(src)-1):
-                print (str(i)+"/"+str(len(src)))
-                urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
 
         src_number=src_number+len(src)-1
-        print("src number"+ str(src_number))
-        ad_statuses=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli x1i64zmx']")
-        for i in ad_statuses:
-            ad_status.append(i.text)
-        ad_text=driver.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
-        for i in ad_text:
-            ad_data.append(i.text)
-        ad_dates=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli']")
-        for i in ad_dates:
-            ad_started_running_date.append(i.text)
+        #print("src number "+ str(src_number))
         file=open("ad data.xlsx","w+",encoding='utf-8')
         workbook=xlsxwriter.Workbook("ad data.xlsx")
         worksheet1=workbook.add_worksheet()
         worksheet1.write(0,0,"Ad Text")
-    
         for i in range(len(ad_data)-1):
             worksheet1.write(i+1,0,ad_data[i])
         workbook.close()

@@ -87,3 +87,10 @@ def with_ztransform_preprocess(hashfunc, hash_size=8):
 dhash_z_transformed = with_ztransform_preprocess(imagehash.dhash, hash_size = 8)
 D:\GAYATHRI\Microsoft VS Code\Documents\GitHub\Selenium_testers\Issues, Politics and Elections
 D:\GAYATHRI\Microsoft VS Code\Documents\GitHub\Selenium_testers\All type
+
+for i in ad_statuses:
+            ad_status.append(i.text)
+        ad_dates=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli']")
+        for i in ad_dates:
+            ad_started_running_date.append(i.text)
+ad_statuses=driver.find_elements(By.XPATH,"//span[@class='x8t9es0 xw23nyj xo1l8bm x63nzvj x108nfp6 xq9mrsl x1h4wwuj xeuugli x1i64zmx']")
