@@ -124,7 +124,6 @@ def get_ad_details(url):
     last_height=driver.execute_script("return document.body.scrollHeight")
     time.sleep(5)
     src_number=0
-    src=[]
     file=open("ad data.xlsx","w+",encoding='utf-8')
     workbook=xlsxwriter.Workbook("ad data.xlsx")
     worksheet1=workbook.add_worksheet()
@@ -143,24 +142,26 @@ def get_ad_details(url):
             ads=driver.find_elements(By.XPATH,"//div[@class= '_7jvw x2izyaf x1hq5gj4 x1d52u69']")
             print(len(ads))
             for ad in ads:
+                src=[]
+                src_number=0
                 images= ad.find_elements(By.TAG_NAME,"img")
                 ad_text=ad.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
                 for img in images:
                     src.append(img.get_attribute("src"))
+                #src_number=src_number+len(src)-1
+                #print("src_numer="+str(src_number))
                 for i in ad_text:
                     ad_data.append(i.text)
-                print(len(images))
+                #print("length of src="+str(len(src)))
                 for i in range(len(ad_data)-1):
                     worksheet1.write(i+1,0,ad_data[i]) 
                 for i in range(0,len(src)):
                     print (str(i)+"/"+str(len(src)))
                     urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
                     worksheet1.write(i+1,3,"{}.jpg".format(i))
-                src_number=src_number+len(src)-1
-            #print("src number "+ str(src_number))
+            #print("src number "+ str(src_number)
             
-                
-    workbook.close()
+                workbook.close()
 def enter_main_inputs(country,ad_type,ad_name):
     if ad_type == "1":
         ad_type_string="all"
