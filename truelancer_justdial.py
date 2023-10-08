@@ -9,6 +9,7 @@ import time
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
+import xlsxwriter
 #page=requests.get(url)
 Location=[]
 Category=[]
@@ -18,6 +19,28 @@ Phone_Number=[]
 Email=[]
 Website=[]
 Vendor_JD_link=[]
+def scroll_down(self):
+
+    # Get scroll height.
+    last_height = self.driver.execute_script("return document.body.scrollHeight")
+
+    while True:
+
+        # Scroll down to the bottom.
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+        # Wait to load the page.
+        time.sleep(2)
+
+        # Calculate new scroll height and compare with last scroll height.
+        new_height = self.driver.execute_script("return document.body.scrollHeight")
+
+        if new_height == last_height:
+
+            break
+
+        last_height = new_height
+        
 
 def web_scraping(city,job_category):
     driver=webdriver.Chrome()
