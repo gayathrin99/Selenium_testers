@@ -21,6 +21,16 @@ time.sleep(5)
 ad_status=[]
 ad_data=[]
 ad_started_running_date=[]
+path1 = "All type"
+path2 = "Issues, Politics and Elections"
+isExist = os.path.exists(path1)
+if not isExist:
+    os.makedirs(path1)
+    print("The new directory for ad type is created!")
+isExist = os.path.exists(path2)
+if not isExist:
+    os.makedirs(path2)
+    print("The second directory for ad type is created!")
 def scroll_down(self):
 
     # Get scroll height.
@@ -87,22 +97,39 @@ def countries_list(country):
 def get_ad_details(url):
     url="https://www.facebook.com/ads/library/"
     page=requests.get(url)
+    time.sleep(5)
+    if ad_category == "2":
+        parent_directory=os.getcwd()
+        os.chdir(parent_directory+"\Issues, Politics and Elections\\"+path+"\\")
+        print(parent_directory+"\Issues, Politics and Elections\\"+path+"\\")
+    else:
+        parent_directory=os.getcwd()
+        print(parent_directory)
+        os.chdir(parent_directory+"\All type\\")
+        print(parent_directory+"\All type\\")
+    path=ad_brand
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
+        print("The new directory for brand name is created!")
+    parent_directory=os.getcwd()
+    os.chdir(parent_directory+"\\"+path+"\\")
+    print(parent_directory+path+"\\")
     no_results=driver.find_element(By.XPATH,"//div[@class= 'x8t9es0 x1uxerd5 xrohxju x108nfp6 xq9mrsl x1h4wwuj x117nqv4 xeuugli']").text
     print(no_results)
     itemTargetCount=int(''.join([i for i in no_results if i.isdigit()]))
-    print(itemTargetCount)
-    #soup=BeautifulSoup(page.content,"html.parser")
+    #print(itemTargetCount)
     last_height=driver.execute_script("return document.body.scrollHeight")
-    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(5)
-    #print(soup.find("body"))  
-    #ad_details=soup.find_all("div",class_="x1ywc1zp x78zum5 xl56j7k x1e56ztr x1277o0a")
-    
     src_number=0
     src=[]
+    
+
     while itemTargetCount > len(ad_status):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1)
+        ads=driver.find_elements(By.XPATH,"//div[@class= '_7jvw x2izyaf x1hq5gj4 x1d52u69']")
+        print(len(ads))
         images=driver.find_elements(By.TAG_NAME,"img")
         print(len(images))
         time.sleep(1)
@@ -110,32 +137,13 @@ def get_ad_details(url):
         if new_height == last_height:
             break
         last_height=new_height
-        path1 = "All type"
-        path2 = "Issues, Politics and Elections"
-        # Check whether the specified path exists or not
-        isExist = os.path.exists(path1)
-        if not isExist:
-            os.makedirs(path1)
-            print("The new directory is created!")
-        isExist = os.path.exists(path2)
-        if not isExist:
-            os.makedirs(path2)
-            print("The second directory is created!")
         for img in images:
             src.append(img.get_attribute('src'))
             #print(img.get_attribute('src'))
-        if ad_category == "2":
-            parent_directory=os.getcwd()
-            os.chdir(parent_directory+"\Issues, Politics and Elections\\")
-            print(parent_directory+"\Issues, Politics and Elections\\")
-            for i in range(src_number,src_number+len(src)-1):
-                print (str(i)+"/"+str(len(src)))
-                urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
-        else:
-            parent_directory=os.getcwd()
-            print(parent_directory)
-            os.chdir(parent_directory+"\All type\\")
-            print(parent_directory+"\All type\\")
+        for i in range(src_number,src_number+len(src)-1):
+            print (str(i)+"/"+str(len(src)))
+            urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
+        
             for i in range(src_number,src_number+len(src)-1):
                 print (str(i)+"/"+str(len(src)))
                 urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
@@ -159,9 +167,6 @@ def get_ad_details(url):
         for i in range(len(ad_data)-1):
             worksheet1.write(i+1,0,ad_data[i])
         workbook.close()
-    print(len(ad_status))
-    print(len(ad_data))
-    print(len(ad_started_running_date))
     #print(ad_details)
     #images=soup.find_all("img", alt=True)
     '''for i in ad_details:
