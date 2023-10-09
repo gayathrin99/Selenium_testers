@@ -95,7 +95,25 @@ def countries_list(country):
         "UNITED STATES MINOR OUTLYING ISLANDS":"UM","URUGUAY":"UY","UZBEKISTAN":"UZ","VANUATU":"VU","VENEZUELA":"VE",
         "VIETNAM":"VN","BRITISH VIRGIN ISLANDS":"VG","VIRGIN ISLANDS":"VI","WALLIS AND FUTUNA":"WF","WESTERN SAHARA":"EH","YEMEN":"YE",
         "ZAMBIA":"ZM","ZIMBABWE":"ZW"}
-    return switch.get(country,"IN")    
+    return switch.get(country,"IN")
+def alpharemover(image):
+    if image.mode != 'RGBA':
+        return image
+    canvas = Image.new('RGBA', image.size, (255,255,255,255))
+    canvas.paste(image, mask=image)
+    return canvas.convert('RGB')
+
+def with_ztransform_preprocess(hashfunc, hash_size=8):
+    def function(path):
+        image = alpharemover(Image.open(path))
+        image = image.convert("L").resize((hash_size, hash_size), Image.ANTIALIAS)
+        data = image.getdata()
+        quantiles = np.arange(100)
+        quantiles_values = np.percentile(data, quantiles)
+        zdata = (np.interp(data, quantiles_values, quantiles) / 100 * 255).astype(np.uint8)
+        image.putdata(zdata)
+        return hashfunc(image)
+    return function    
 def get_ad_details(url):
     url="https://www.facebook.com/ads/library/"
     page=requests.get(url)
@@ -131,7 +149,7 @@ def get_ad_details(url):
     worksheet1.write(0,3,"Image file Name")
     
     for i in tqdm(range(0,100),total=itemTargetCount):
-        while itemTargetCount > len(ad_status):
+        for i in range(0,itemTargetCount):
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(1)
             new_height=driver.execute_script("return document.body.scrollHeight")
@@ -141,9 +159,12 @@ def get_ad_details(url):
                 #print(img.get_attribute('src'))
             ads=driver.find_elements(By.XPATH,"//div[@class= '_7jvw x2izyaf x1hq5gj4 x1d52u69']")
             print(len(ads))
+            src_number=0
+            data_row_number=1
+            image_row_number=1
             for ad in ads:
                 src=[]
-                src_number=0
+                print(ad.tag_name)
                 images= ad.find_elements(By.TAG_NAME,"img")
                 ad_text=ad.find_elements(By.XPATH,"//div[@class= '_4ik4 _4ik5']")
                 for img in images:
@@ -154,12 +175,16 @@ def get_ad_details(url):
                     ad_data.append(i.text)
                 #print("length of src="+str(len(src)))
                 for i in range(len(ad_data)-1):
-                    worksheet1.write(i+1,0,ad_data[i]) 
+                    worksheet1.write(data_row_number+1,0,ad_data[i])
+                    data_row_number=data_row_number+1
                 for i in range(0,len(src)):
-                    print (str(i)+"/"+str(len(src)))
-                    urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(i))
-                    worksheet1.write(i+1,3,"{}.jpg".format(i))
-            #print("src number "+ str(src_number)
+                    #print (str(i)+"/"+str(len(src)))
+                    urllib.request.urlretrieve(str(src[i]),"{}.jpg".format(src_number))
+                    worksheet1.write(image_row_number+1,3,"{}.jpg".format(src_number))
+                    worksheet1.write(image_row_number+1,4,src[i])
+                    src_number=src_number+1
+                    image_row_number=image_row_number+1
+                    #print("src number "+ str(src_number))
             
                 workbook.close()
 def enter_main_inputs(country,ad_type,ad_name):
