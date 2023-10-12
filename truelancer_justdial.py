@@ -48,6 +48,7 @@ def web_scraping(city,job_category):
     city=city
     job_category=job_category
     driver=webdriver.Chrome()
+    driver.maximize_window()    
     url="https://www.justdial.com/"+"/"+city+"/"+job_category+"/"
     file=open(city+"_"+job_category+".xlsx","w+",encoding='utf-8')
     workbook=xlsxwriter.Workbook(city+"_"+job_category+".xlsx"+".xlsx")
@@ -61,24 +62,40 @@ def web_scraping(city,job_category):
     driver.get(url)
     screen_height=driver.execute_script("return window.screen.height;")
     j=1
-    time.sleep(5)
+    wait=time.sleep(5)
     Location.append(city)
     Category.append(job_category)
     Parent_JD_Link.append(url)
-    no_of_results=driver.find_element(By.XPATH,"//li[@class= 'jsx-8019251d22823f16 breadcrumb_item font11 fw400 color777  bls']")
-    print(no_of_results.text)
+    no_of_results=driver.find_element(By.XPATH,"//li[@class= 'jsx-8019251d22823f16 breadcrumb_item font11 fw400 color777  bls']").text
+    itemTargetCount=int(''.join([i for i in no_of_results if i.isdigit()]))
+    print(itemTargetCount)
     #soup=BeautifulSoup(page.text,"html.parser")
     #print(driver.find_elements(By.TAG_NAME, "h2"))
     #time.sleep(2)
-    while True:
-        driver.execute_script("window.scrollTo(0,{screen_height}*{j}*2);".format(screen_height=screen_height, j=j))
+    anchor_locator=(By.XPATH,"//div[@class='jsx-8019251d22823f16 results_listing_container']")
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@class='jsx-8019251d22823f16 results_listing_container']")))
+    anchors = driver.find_elements(*anchor_locator)  
+
+    # Fetching the text of last element
+    last_text = text_list[-1].text
+    print(last_text)
+    while itemTargetCount > len(text_list):
+        #driver.execute_script("return arguments[0].scrollIntoView();", anchors[-2])
+        #anchors = wait.until(EC.visibility_of_all_elements_located(anchor_locator))
+        #for e in anchors:
+          #  print(e.text)
+        '''driver.execute_script("window.scrollTo(0,{screen_height}*{j}*2);".format(screen_height=screen_height, j=j))
         j=j+1
         time.sleep(10)
         driver.page_source
         scroll_height = driver.execute_script("return document.body.scrollHeight;") 
         if (screen_height) * j > scroll_height:
-            break
-        vendor_names=driver.find_elements(By.TAG_NAME,"h2")
+            break'''
+        #div = driver.find_elements(By.)
+        driver.execute_script("return arguments[0].scrollIntoView();", anchors[-2])
+        anchors = wait.until(EC.visibility_of_all_elements_located(anchor_locator))
+    for e in anchors:
+        vendor_names=e.find_elements(By.TAG_NAME,"h2")
         phone_numbers=driver.find_elements(By.XPATH,"//span[@class= 'jsx-3349e7cd87e12d75 callcontent callNowAnchor']")
         vendor_jd_webpage_link_click=driver.find_elements(By.XPATH,"//h2[@class= 'jsx-3349e7cd87e12d75 resultbox_title font22 fw500 color111 complist_title']")
         print(len(phone_numbers))
